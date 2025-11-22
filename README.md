@@ -11,8 +11,12 @@ How to use
 1. Clone the repo and run the script:
 
 ```bash
-git clone <your-repo-url> mac-setup
-cd mac-setup
+mkdir Developer
+cd Developer
+
+curl -L https://github.com/mingwandowski/mac-setup/archive/refs/heads/main.zip -o mac-setup.zip
+unzip mac-setup.zip
+cd mac-setup-main
 chmod +x setup.sh
 ./setup.sh
 ```

@@ -16,14 +16,12 @@ echo ""
 # 1. Rosetta (for Apple Silicon)
 #
 if [[ "$(uname -m)" == "arm64" ]]; then
-    echo ">>> Checking Rosetta..."
-    if ! pkgutil --files com.apple.pkg.RosettaUpdateAuto >/dev/null 2>&1; then
+    if ! /usr/bin/pgrep oahd >/dev/null 2>&1; then
         echo ">>> Installing Rosetta..."
         softwareupdate --install-rosetta --agree-to-license || true
     else
         echo ">>> Rosetta already installed."
     fi
-    echo ""
 fi
 
 #
@@ -39,6 +37,10 @@ else
     echo ">>> Homebrew already installed."
 fi
 echo ""
+
+echo ">>> Updating Homebrew..."
+brew update
+brew upgrade
 
 echo ">>> Installing packages from Brewfile..."
 brew bundle --file=./Brewfile || {

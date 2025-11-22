@@ -1,8 +1,3 @@
-tap "homebrew/cask"
-tap "homebrew/core"
-tap "homebrew/cask-versions"
-tap "homebrew/cask-fonts"
-
 # ----- CLI tools -----
 brew "git"
 brew "node"
