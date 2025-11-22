@@ -28,17 +28,49 @@ fi
 # 2. Homebrew
 #
 echo ">>> Checking Homebrew..."
-if ! command -v brew >/dev/null 2>&1 && [ ! -x "/opt/homebrew/bin/brew" ]; then
-    echo ">>> Homebrew not found. Installing..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
-    eval "$(/opt/homebrew/bin/brew shellenv)"
+# If brew is already in PATH, use it. Otherwise look for common install locations
+if command -v brew >/dev/null 2>&1; then
+    echo ">>> Homebrew already in PATH."
 else
-    echo ">>> Homebrew already installed."
-    if ! command -v brew >/dev/null 2>&1 && [ -x "/opt/homebrew/bin/brew" ]; then
-        eval "$(/opt/homebrew/bin/brew shellenv)"
+    # Common locations for Homebrew on macOS (Apple Silicon and Intel)
+    if [ -x "/opt/homebrew/bin/brew" ]; then
+        BREW_BIN="/opt/homebrew/bin/brew"
+    elif [ -x "/usr/local/bin/brew" ]; then
+        BREW_BIN="/usr/local/bin/brew"
+    else
+        BREW_BIN=""
+    fi
+
+    if [ -n "${BREW_BIN}" ]; then
+        echo ">>> Found Homebrew at ${BREW_BIN} but it's not in PATH. Adding shellenv to profile."
+        # Add `brew shellenv` to zprofile so future interactive/login shells get it
+        echo "eval \"$(${BREW_BIN} shellenv)\"" >> ~/.zprofile
+        # Apply to current shell so this script can use brew immediately
+        eval "$(${BREW_BIN} shellenv)"
+    else
+        echo ">>> Homebrew not found. Installing..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        # After installation, try to detect where brew landed and set shellenv
+        if [ -x "/opt/homebrew/bin/brew" ]; then
+            echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        elif [ -x "/usr/local/bin/brew" ]; then
+            echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zprofile
+            eval "$(/usr/local/bin/brew shellenv)"
+        fi
     fi
 fi
+echo ""
+
+echo ">>> Updating Homebrew..."
+brew update
+brew upgrade
+
+echo ">>> Installing packages from Brewfile..."
+brew bundle --file=./Brewfile || {
+    echo "⚠️ Warning: Some Brewfile items failed to install."
+}
+echo ""
 
 #
 # 3. Git Config
@@ -47,13 +79,15 @@ divider
 echo ">>> Git configuration"
 divider
 
-read -r -p "Enter Git user.name (leave empty to skip): " GIT_NAME
+printf "Enter Git user.name (leave empty to skip): "
+read -r GIT_NAME
 if [ -n "${GIT_NAME}" ]; then
     git config --global user.name "$GIT_NAME"
     echo "> Set git user.name = $GIT_NAME"
 fi
 
-read -r -p "Enter Git user.email (leave empty to skip): " GIT_EMAIL
+printf "Enter Git user.email (leave empty to skip): "
+read -r GIT_EMAIL
 if [ -n "${GIT_EMAIL}" ]; then
     git config --global user.email "$GIT_EMAIL"
     echo "> Set git user.email = $GIT_EMAIL"
@@ -67,15 +101,18 @@ divider
 echo ">>> SSH key"
 divider
 
-read -r -p "Generate a new SSH key? [y/N]: " GEN_SSH
+printf "Generate a new SSH key? [y/N]: "
+read -r GEN_SSH
 if [[ "${GEN_SSH}" =~ ^[Yy]$ ]]; then
-    read -r -p "Enter SSH key comment (default = git email): " SSH_COMMENT
+    printf "Enter SSH key comment (default = git email): "
+    read -r SSH_COMMENT
     SSH_COMMENT="${SSH_COMMENT:-${GIT_EMAIL:-no-comment}}"
 
     mkdir -p "$HOME/.ssh"
     KEY_PATH="$HOME/.ssh/id_ed25519"
     if [ -f "$KEY_PATH" ]; then
-        read -r -p "A key already exists at $KEY_PATH. Overwrite? [y/N]: " OVERWRITE
+        printf "A key already exists at $KEY_PATH. Overwrite? [y/N]: "
+        read -r OVERWRITE
         if [[ ! "$OVERWRITE" =~ ^[Yy]$ ]]; then
             echo "> Skipping key generation (existing key kept)."
         else

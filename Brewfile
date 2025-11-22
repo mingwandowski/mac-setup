@@ -4,7 +4,6 @@ brew "node"
 brew "python"
 
 # ---- QuickLook plugins ----
-cask "qlimagesize"
 cask "qlmarkdown"
 cask "qlvideo"
 cask "syntax-highlight"
