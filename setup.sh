@@ -28,25 +28,17 @@ fi
 # 2. Homebrew
 #
 echo ">>> Checking Homebrew..."
-if ! command -v brew >/dev/null 2>&1; then
+if ! command -v brew >/dev/null 2>&1 && [ ! -x "/opt/homebrew/bin/brew" ]; then
     echo ">>> Homebrew not found. Installing..."
     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
     eval "$(/opt/homebrew/bin/brew shellenv)"
 else
     echo ">>> Homebrew already installed."
+    if ! command -v brew >/dev/null 2>&1 && [ -x "/opt/homebrew/bin/brew" ]; then
+        eval "$(/opt/homebrew/bin/brew shellenv)"
+    fi
 fi
-echo ""
-
-echo ">>> Updating Homebrew..."
-brew update
-brew upgrade
-
-echo ">>> Installing packages from Brewfile..."
-brew bundle --file=./Brewfile || {
-    echo "⚠️ Warning: Some Brewfile items failed to install."
-}
-echo ""
 
 #
 # 3. Git Config
