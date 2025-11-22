@@ -35,3 +35,5 @@ Mannual download apps:
 - Color Picker
 - Pixel Cake
 - Red Note
+- Bosca Ceoil
+- Unity Hub
