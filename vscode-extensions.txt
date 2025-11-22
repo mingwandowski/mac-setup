@@ -1,0 +1,5 @@
+GitHub.copilot
+geequlim.godot-tools
+ms-python.python
+github.vscode-github-actions
+eamodio.gitlens

@@ -1,0 +1,35 @@
+tap "homebrew/cask"
+tap "homebrew/core"
+tap "homebrew/cask-versions"
+tap "homebrew/cask-fonts"
+
+# ----- CLI tools -----
+brew "git"
+brew "node"
+brew "python"
+
+# ---- QuickLook plugins ----
+cask "qlimagesize"
+cask "qlmarkdown"
+cask "qlvideo"
+cask "syntax-highlight"
+
+# ---- Apps ----
+cask "free-download-manager"
+cask "typora"
+cask "betterdisplay"
+cask "monitorcontrol"
+cask "iina"
+cask "baidunetdisk"
+cask "blender"
+cask "discord"
+cask "visual-studio-code"
+cask "godot"
+cask "fliqlo"
+cask "wechat"
+cask "google-chrome"
+cask "wpsoffice"
+cask "the-unarchiver"
+cask "steam"
+cask "crossover"
+cask "logi-options-plus"
